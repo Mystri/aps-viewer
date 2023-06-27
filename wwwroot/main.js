@@ -62,6 +62,7 @@ async function setupModelUpload(viewer) {
 }
 
 async function onModelSelected(viewer, urn) {
+    console.log('OnModelSelected', urn);
     if (window.onModelSelectedTimeout) {
         clearTimeout(window.onModelSelectedTimeout);
         delete window.onModelSelectedTimeout;

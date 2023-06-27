@@ -88,4 +88,17 @@ service.getManifest = async (urn) => {
     }
 };
 
+service.getMetadata = async (urn) => {
+    try {
+        const resp = await new APS.DerivativesApi().getMetadata(urn, {}, null, await service.getInternalToken());
+        return resp.body;
+    } catch (err) {
+        if (err.response.status === 404) {
+            return null;
+        } else {
+            throw err;
+        }
+    }
+}
+
 service.urnify = (id) => Buffer.from(id).toString('base64').replace(/=/g, '');

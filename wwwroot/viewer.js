@@ -1,4 +1,5 @@
 /// import * as Autodesk from "@types/forge-viewer";
+import './extensions/TestExtension.js';
 
 async function getAccessToken(callback) {
     try {
@@ -18,7 +19,7 @@ export function initViewer(container) {
     return new Promise(function (resolve, reject) {
         Autodesk.Viewing.Initializer({ getAccessToken }, function () {
             const config = {
-                extensions: ['Autodesk.DocumentBrowser']
+                extensions: ['Autodesk.DocumentBrowser', 'TestExtension']
             };
             const viewer = new Autodesk.Viewing.GuiViewer3D(container, config);
             viewer.start();
@@ -29,14 +30,21 @@ export function initViewer(container) {
 }
 
 export function loadModel(viewer, urn) {
+    console.log('load model' + urn);
     return new Promise(function (resolve, reject) {
         function onDocumentLoadSuccess(doc) {
-            resolve(viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry()));
+            viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry());
         }
         function onDocumentLoadFailure(code, message, errors) {
             reject({ code, message, errors });
         }
         viewer.setLightPreset(0);
         Autodesk.Viewing.Document.load('urn:' + urn, onDocumentLoadSuccess, onDocumentLoadFailure);
+        Autodesk.Viewing.Document.load('urn:' + urn,
+        (doc) => {
+            viewer.loadDocumentNode(doc, doc.getRoot().search({ "role":"2d", "type":"geometry"})[0]);
+        },
+        onDocumentLoadFailure);
+
     });
 }

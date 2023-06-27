@@ -1,6 +1,6 @@
 const express = require('express');
 const formidable = require('express-formidable');
-const { listObjects, uploadObject, translateObject, getManifest, urnify } = require('../services/aps.js');
+const { listObjects, uploadObject, translateObject, getManifest, urnify, getMetadata } = require('../services/aps.js');
 
 let router = express.Router();
 
@@ -11,6 +11,15 @@ router.get('/api/models', async function (req, res, next) {
             name: o.objectKey,
             urn: urnify(o.objectId)
         })));
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.get('/api/models/:urn/metadata', async function (req, res, next) {
+    try {
+        const metadata = await(getMetadata(req.params.urn));
+        res.json(metadata);
     } catch (err) {
         next(err);
     }
